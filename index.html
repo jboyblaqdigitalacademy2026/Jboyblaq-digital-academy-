@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0056D2">
+<title>JboyBlaq Digital Academy</title>
+<style>
+:root{
+  --blue:#0056D2; --blue-dark:#00307A; --blue-soft:#EAF1FD; --ink:#1B2A41;
+  --muted:#5B6B82; --line:#DCE4F0; --white:#fff; --green:#1FA855;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-behavior:smooth;scroll-padding-top:70px;-webkit-text-size-adjust:100%}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--white);line-height:1.55}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+header{position:sticky;top:0;background:rgba(255,255,255,.96);border-bottom:1px solid var(--line);z-index:10}
+.nav{display:flex;align-items:center;justify-content:space-between;height:60px}
+.brand{font-weight:800;font-size:19px;color:var(--blue);letter-spacing:-.3px}
+.brand span{color:var(--ink)}
+.nav a.link{color:var(--blue);font-weight:600;text-decoration:none;font-size:15px}
+.hero{background:linear-gradient(160deg,var(--blue-dark),var(--blue));color:#fff;padding:56px 0 64px}
+.hero h1{font-size:clamp(30px,7vw,52px);line-height:1.1;margin:0 0 16px;letter-spacing:-1px;max-width:680px}
+.hero p{font-size:clamp(16px,3.8vw,19px);max-width:560px;margin:0 0 28px;opacity:.93}
+.btn{display:inline-block;border:0;border-radius:10px;padding:14px 22px;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none;text-align:center;font-family:inherit}
+.btn-white{background:#fff;color:var(--blue)}
+.btn-blue{background:var(--blue);color:#fff;width:100%}
+.btn-blue:active,.btn-white:active{transform:scale(.98)}
+.btn-wa{background:var(--green);color:#fff;width:100%}
+.btn-ghost{background:var(--blue-soft);color:var(--blue);padding:10px 14px;font-size:14px;border-radius:8px}
+section{padding:52px 0}
+h2{font-size:clamp(24px,5.5vw,34px);margin:0 0 8px;letter-spacing:-.5px}
+.sub{color:var(--muted);margin:0 0 28px}
+.grid{display:grid;gap:18px;grid-template-columns:1fr}
+@media(min-width:760px){.grid{grid-template-columns:repeat(3,1fr)}}
+.card{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+.thumb{height:110px;background:var(--blue-soft);display:flex;align-items:center;justify-content:center;font-size:48px}
+.card .body{padding:18px;display:flex;flex-direction:column;flex:1}
+.card h3{margin:0 0 8px;font-size:19px;line-height:1.25}
+.card p{margin:0 0 14px;color:var(--muted);font-size:15px}
+.card ul{margin:0 0 16px;padding-left:18px;font-size:14px;color:var(--ink)}
+.price{font-size:26px;font-weight:800;color:var(--blue);margin-top:auto;margin-bottom:4px}
+.tag{font-size:13px;color:var(--muted);margin-bottom:14px}
+.alt{background:var(--blue-soft)}
+.steps{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:760px){.steps{grid-template-columns:repeat(4,1fr)}}
+.step{background:#fff;border-radius:12px;padding:18px;border:1px solid var(--line)}
+.step b{display:inline-flex;width:32px;height:32px;border-radius:50%;background:var(--blue);color:#fff;align-items:center;justify-content:center;margin-bottom:8px}
+.step p{margin:0;font-size:15px}
+.life{text-align:center}
+.life p{max-width:560px;margin:0 auto;color:var(--muted)}
+footer{background:var(--blue-dark);color:#cfdcf5;padding:28px 0;text-align:center;font-size:14px}
+footer a{color:#fff}
+.overlay{position:fixed;inset:0;background:rgba(10,25,50,.55);display:none;align-items:flex-end;justify-content:center;z-index:50}
+.overlay.open{display:flex}
+.sheet{background:#fff;width:100%;max-width:480px;border-radius:18px 18px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom,0px));max-height:92vh;overflow-y:auto}
+@media(min-width:600px){.overlay{align-items:center}.sheet{border-radius:18px}}
+.sheet h3{margin:0 0 4px;font-size:20px}
+.sheet .amt{font-size:28px;font-weight:800;color:var(--blue);margin:0 0 14px}
+.bank{background:var(--blue-soft);border-radius:12px;padding:14px;margin-bottom:14px;font-size:15px}
+.bank div{display:flex;justify-content:space-between;gap:10px;padding:4px 0}
+.bank span{color:var(--muted)}
+.bank strong{text-align:right}
+label{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
+input{width:100%;font-size:16px;padding:12px;border:1px solid var(--line);border-radius:10px;margin-bottom:14px;font-family:inherit}
+input:focus,button:focus-visible,a:focus-visible{outline:3px solid #8DB5F5;outline-offset:2px}
+.note{font-size:13px;color:var(--muted);margin:10px 0 0;text-align:center}
+.close{float:right;background:none;border:0;font-size:28px;line-height:1;color:var(--muted);cursor:pointer}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="brand">JboyBlaq <span>Digital Academy</span></div>
+    <a class="link" href="#courses">Courses</a>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <h1>Learn digital skills that can change your income.</h1>
+    <p>Welcome to JboyBlaq Digital Academy. Simple, practical courses taught step by step, so you can start from zero and build real skills. Pay once and keep your course for life.</p>
+    <a class="btn btn-white" href="#courses">See courses</a>
+  </div>
+</div>
+
+<section id="courses">
+  <div class="wrap">
+    <h2>Our courses</h2>
+    <p class="sub">Choose a course and pay once. No monthly fees.</p>
+    <div class="grid" id="courseGrid"></div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <h2>How to join</h2>
+    <p class="sub">Four simple steps.</p>
+    <div class="steps">
+      <div class="step"><b>1</b><p>Tap <strong>Buy this course</strong> on the course you want.</p></div>
+      <div class="step"><b>2</b><p>Pay by bank transfer to the account shown.</p></div>
+      <div class="step"><b>3</b><p>Send your payment details to us on WhatsApp.</p></div>
+      <div class="step"><b>4</b><p>We confirm your payment and send your course access.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="life">
+  <div class="wrap">
+    <h2>Lifetime access</h2>
+    <p>Every course you buy is yours for life. Learn at your own pace and come back any time.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    &copy; <span id="yr"></span> JboyBlaq Digital Academy. Questions? <a id="footWa" href="#">Chat on WhatsApp</a>
+  </div>
+</footer>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="sheet">
+    <button class="close" id="closeBtn" aria-label="Close">&times;</button>
+    <h3 id="mTitle"></h3>
+    <p class="amt" id="mPrice"></p>
+    <div class="bank">
+      <div><span>Bank</span><strong id="bBank"></strong></div>
+      <div><span>Account name</span><strong id="bName"></strong></div>
+      <div><span>Account number</span><strong id="bNum"></strong></div>
+    </div>
+    <button class="btn btn-ghost" id="copyBtn" style="margin-bottom:16px">Copy account number</button>
+    <label for="stName">Your full name</label>
+    <input id="stName" type="text" placeholder="e.g. Ada Okafor" autocomplete="name">
+    <button class="btn btn-wa" id="waBtn">I have paid, message us on WhatsApp</button>
+    <p class="note">Send your payment receipt or screenshot on WhatsApp. We will confirm and send your lifetime access.</p>
+  </div>
+</div>
+
+<script>
+/* ====== EDIT THESE 4 THINGS ====== */
+var WHATSAPP_NUMBER = "2348000000000";   // your number, country code first, no + or spaces
+var BANK_NAME       = "Your Bank Name";
+var ACCOUNT_NAME    = "Your Account Name";
+var ACCOUNT_NUMBER  = "0000000000";
+/* ================================= */
+
+var COURSES = [
+  {icon:"🌐", title:"Website Creation for Beginners", price:15000,
+   desc:"Build and publish your own professional website, even if you have never done it before.",
+   points:["Plan and design your site","Build it step by step","Put it online"]},
+  {icon:"🎨", title:"Professional Graphic Design with Canva", price:10000,
+   desc:"Create flyers, logos and social media posts that look professional, using only Canva.",
+   points:["Design basics and colours","Flyers, logos and posts","Design for clients"]},
+  {icon:"🤖", title:"Artificial Intelligence for Beginners", price:12000,
+   desc:"Understand AI and learn to use it to save time, create content and work smarter.",
+   points:["What AI is and how it works","Practical AI tools","Use AI in daily work"]}
+];
+
+function naira(n){ return "\u20A6" + n.toLocaleString("en-NG"); }
+function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+
+var grid = document.getElementById("courseGrid");
+COURSES.forEach(function(c,i){
+  var el = document.createElement("div");
+  el.className = "card";
+  el.innerHTML =
+    '<div class="thumb">'+c.icon+'</div><div class="body">'+
+    '<h3>'+esc(c.title)+'</h3><p>'+esc(c.desc)+'</p><ul>'+
+    c.points.map(function(p){return "<li>"+esc(p)+"</li>";}).join("")+
+    '</ul><div class="price">'+naira(c.price)+'</div>'+
+    '<div class="tag">One-time payment &bull; Lifetime access</div>'+
+    '<button class="btn btn-blue" data-i="'+i+'">Buy this course</button></div>';
+  grid.appendChild(el);
+});
+
+var overlay = document.getElementById("overlay"), current = null;
+grid.addEventListener("click", function(e){
+  var b = e.target.closest("button[data-i]"); if(!b) return;
+  current = COURSES[b.getAttribute("data-i")];
+  document.getElementById("mTitle").textContent = current.title;
+  document.getElementById("mPrice").textContent = naira(current.price);
+  document.getElementById("bBank").textContent = BANK_NAME;
+  document.getElementById("bName").textContent = ACCOUNT_NAME;
+  document.getElementById("bNum").textContent = ACCOUNT_NUMBER;
+  overlay.classList.add("open");
+  document.body.style.overflow = "hidden";
+});
+function closeSheet(){ overlay.classList.remove("open"); document.body.style.overflow = ""; }
+document.getElementById("closeBtn").onclick = closeSheet;
+overlay.addEventListener("click", function(e){ if(e.target===overlay) closeSheet(); });
+document.addEventListener("keydown", function(e){ if(e.key==="Escape") closeSheet(); });
+
+document.getElementById("copyBtn").onclick = function(){
+  var btn = this;
+  function done(){ btn.textContent = "Copied!"; setTimeout(function(){btn.textContent="Copy account number";},1800); }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(ACCOUNT_NUMBER).then(done,function(){});
+  }
+};
+
+document.getElementById("waBtn").onclick = function(){
+  var name = document.getElementById("stName").value.trim() || "(my name)";
+  var msg = "Hello JboyBlaq Digital Academy, I have paid for a course.\n\n" +
+    "Name: " + name + "\nCourse: " + current.title + "\nAmount: " + naira(current.price) +
+    "\n\nI am sending my payment receipt now. Please confirm and send my lifetime access.";
+  window.open("https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(msg), "_blank");
+};
+
+document.getElementById("footWa").href = "https://wa.me/" + WHATSAPP_NUMBER;
+document.getElementById("yr").textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
