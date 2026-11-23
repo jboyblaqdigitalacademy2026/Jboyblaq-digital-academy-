@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#00307A">
+<title>Admin | JboyBlaq Digital Academy</title>
+<style>
+:root{--blue:#0056D2;--dark:#00307A;--soft:#EAF1FD;--ink:#1B2A41;--muted:#5B6B82;--line:#DCE4F0;--green:#1FA855;--red:#C62828;box-sizing:border-box;padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:#F6F8FC;line-height:1.5;-webkit-text-size-adjust:100%}
+.wrap{max-width:900px;margin:0 auto;padding:16px}
+header{background:var(--dark);color:#fff;position:sticky;top:0;z-index:5;padding-top:env(safe-area-inset-top,0px)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:56px;max-width:900px;margin:0 auto;padding:0 16px;font-weight:800}
+.nav button{background:rgba(255,255,255,.18);color:#fff;border:0;border-radius:8px;padding:8px 12px;font-size:14px;font-weight:600;font-family:inherit}
+.btn{display:inline-block;border:0;border-radius:10px;padding:12px 16px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;text-align:center}
+.b1{background:var(--blue);color:#fff}.b2{background:var(--soft);color:var(--blue)}.b3{background:var(--green);color:#fff}.b4{background:#FDECEC;color:var(--red)}
+.full{width:100%}.sm{padding:9px 12px;font-size:14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.card h3{margin:0 0 4px;font-size:17px}.card p{margin:0 0 10px;color:var(--muted);font-size:14px}
+h2{margin:6px 0 14px;font-size:21px}
+label{display:block;font-size:14px;font-weight:600;margin:0 0 5px}
+input,textarea,select{width:100%;font-size:16px;padding:11px;border:1px solid var(--line);border-radius:10px;margin-bottom:12px;font-family:inherit;background:#fff}
+textarea{min-height:90px}
+.tabs{display:flex;gap:5px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:5px;margin-bottom:16px;overflow-x:auto}
+.tabs button{flex:1;border:0;background:none;padding:10px 8px;border-radius:8px;font-size:14px;font-weight:600;color:var(--muted);font-family:inherit;white-space:nowrap}
+.tabs button.on{background:var(--blue);color:#fff}
+.msg{padding:11px 13px;border-radius:10px;font-size:14px;margin-bottom:13px;background:var(--soft);color:var(--dark)}.msg.err{background:#FDECEC;color:var(--red)}
+.row{display:flex;gap:8px}.row .btn{flex:1}
+.badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 9px;border-radius:20px;background:#E3F6EA;color:#14793C;margin:0 6px 6px 0}
+.badge.w{background:#FFF3D6;color:#8A5A00}
+.hide{display:none}.muted{color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+<header><div class="nav"><span>Admin Dashboard</span><button id="outBtn" class="hide">Log out</button></div></header>
+
+<div class="wrap" id="authView" style="max-width:440px">
+  <div class="card" style="margin-top:20px"><h2>Admin login</h2><div id="amsg"></div>
+    <label for="em">Email</label><input id="em" type="email" autocomplete="email">
+    <label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password">
+    <button class="btn b1 full" id="goBtn">Log in</button></div>
+</div>
+
+<div class="wrap hide" id="appView">
+  <div class="tabs" id="tabs"><button data-t="pay" class="on">Payments</button><button data-t="stu">Students</button><button data-t="crs">Courses</button><button data-t="les">Lessons</button></div>
+  <div id="msg"></div><div id="content"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+var sb=supabase.createClient("https://cogebzxdqlhojzabqeli.supabase.co","sb_publishable_QwatGWcSpnVydE7j8Uj3gQ_G5GxFsI9");
+var A={courses:[],enr:[],prof:[],les:[]},tab="pay",lc=null;
+function $(i){return document.getElementById(i)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function naira(n){return "\u20A6"+Number(n).toLocaleString("en-NG")}
+function say(t,err){$("msg").innerHTML=t?'<div class="msg'+(err?' err':'')+'">'+esc(t)+'</div>':"";if(t)scrollTo(0,0)}
+function ok(u){return !u||/^https:\/\//.test(u)}
+function cname(id){var c=A.courses.filter(function(x){return x.id===id})[0];return c?c.title:"(deleted)"}
+function pr(id){return A.prof.filter(function(p){return p.id===id})[0]||{full_name:"(no name)",email:""}}
+function dt(s){return s?new Date(s).toLocaleDateString("en-GB"):""}
+
+$("goBtn").onclick=async function(){
+  var r=await sb.auth.signInWithPassword({email:$("em").value.trim(),password:$("pw").value});
+  if(r.error)$("amsg").innerHTML='<div class="msg err">'+esc(r.error.message)+'</div>';
+};
+$("outBtn").onclick=function(){sb.auth.signOut()};
+
+async function load(){
+  var r=await Promise.all([sb.from("courses").select("*").order("created_at"),sb.from("enrollments").select("*").order("requested_at",{ascending:false}),sb.from("profiles").select("*").order("created_at",{ascending:false}),sb.from("lessons").select("*").order("position")]);
+  A.courses=r[0].data||[];A.enr=r[1].data||[];A.prof=r[2].data||[];A.les=r[3].data||[];
+  if(!lc&&A.courses[0])lc=A.courses[0].id;
+}
+function show(){
+  var T=$("tabs").children;for(var i=0;i<T.length;i++)T[i].className=T[i].dataset.t===tab?"on":"";
+  $("content").innerHTML=tab==="pay"?vPay():tab==="stu"?vStu():tab==="crs"?vCrs():vLes();
+}
+function vPay(){
+  var P=A.enr.filter(function(e){return e.status==="pending"});
+  var h="<h2>Pending payments ("+P.length+")</h2>";
+  if(!P.length)h+='<div class="card"><p>No pending requests. Students appear here after they tap Buy.</p></div>';
+  return h+P.map(function(e){var p=pr(e.user_id),c=A.courses.filter(function(x){return x.id===e.course_id})[0]||{};
+    return '<div class="card"><h3>'+esc(p.full_name)+'</h3><p>'+esc(p.email)+'<br>'+esc(c.title)+' &middot; <b>'+naira(c.price||0)+'</b><br>Requested '+dt(e.requested_at)+'</p><p>Approve only after you confirm the money in your bank app.</p><div class="row"><button class="btn b3" data-a="ap" data-v="'+e.id+'">Approve</button><button class="btn b4" data-a="rj" data-v="'+e.id+'">Reject</button></div></div>'}).join("");
+}
+function vStu(){
+  var h="<h2>Students ("+A.prof.length+")</h2>";
+  return h+A.prof.map(function(p){
+    var E=A.enr.filter(function(e){return e.user_id===p.id});
+    return '<div class="card"><h3>'+esc(p.full_name||"(no name)")+'</h3>
