@@ -87,4 +87,51 @@ function vStu(){
   var h="<h2>Students ("+A.prof.length+")</h2>";
   return h+A.prof.map(function(p){
     var E=A.enr.filter(function(e){return e.user_id===p.id});
-    return '<div class="card"><h3>'+esc(p.full_name||"(no name)")+'</h3>
+    return '<div class="card"><h3>'+esc(p.full_name||"(no name)")+'</h3><p>'+esc(p.email)+' &middot; joined '+dt(p.created_at)+'</p>'+
+    (E.length?E.map(function(e){return '<span class="badge'+(e.status==="approved"?"":" w")+'">'+esc(cname(e.course_id))+' ('+e.status+')</span>'+(e.status==="approved"?'<button class="btn b4 sm" data-a="rv" data-v="'+e.id+'">Revoke</button> ':'')}).join(""):'<span class="muted">No courses yet</span>')+'</div>'}).join("");
+}
+function vCrs(){
+  return '<h2>Courses</h2><div class="card"><h3>Add a course</h3><label for="nt">Title</label><input id="nt"><label for="nd">Description</label><textarea id="nd"></textarea><label for="np">Price (naira, numbers only)</label><input id="np" inputmode="numeric"><button class="btn b1 full" data-a="addC">Add course</button></div>'+
+  A.courses.map(function(c){return '<div class="card"><label>Title</label><input id="t'+c.id+'" value="'+esc(c.title)+'"><label>Description</label><textarea id="d'+c.id+'">'+esc(c.description)+'</textarea><label>Price</label><input id="p'+c.id+'" inputmode="numeric" value="'+c.price+'"><div class="row"><button class="btn b1" data-a="svC" data-v="'+c.id+'">Save</button><button class="btn b2" data-a="pub" data-v="'+c.id+'">'+(c.published?"Hide":"Show")+'</button></div><p class="muted" style="margin-top:8px">'+(c.published?"Visible to students":"Hidden from students")+'</p></div>'}).join("");
+}
+function vLes(){
+  var L=A.les.filter(function(l){return l.course_id===lc});
+  return '<h2>Lessons</h2><label for="lcs">Course</label><select id="lcs">'+A.courses.map(function(c){return '<option value="'+c.id+'"'+(c.id===lc?" selected":"")+'>'+esc(c.title)+'</option>'}).join("")+'</select>'+
+  '<div class="card"><h3>Add a lesson</h3><label for="lt">Lesson title</label><input id="lt"><label for="lv">Video link (YouTube unlisted, https://...)</label><input id="lv" inputmode="url"><label for="ln">Notes (optional)</label><textarea id="ln"></textarea><label for="lm">Material link, e.g. PDF (optional, https://...)</label><input id="lm" inputmode="url"><label for="lp">Lesson number</label><input id="lp" inputmode="numeric" value="'+(L.length+1)+'"><button class="btn b1 full" data-a="addL">Add lesson</button></div>'+
+  '<h3 style="margin:16px 0 8px">Lessons in this course ('+L.length+')</h3>'+L.map(function(l){return '<div class="card"><h3>'+l.position+'. '+esc(l.title)+'</h3><p>'+esc(l.video_url||"No video")+'</p><button class="btn b4 sm" data-a="delL" data-v="'+l.id+'">Delete lesson</button></div>'}).join("");
+}
+async function run(q,okMsg){var r=await q;if(r.error){say("Error: "+r.error.message,1);return false}await load();show();say(okMsg);return true}
+
+document.addEventListener("change",function(e){if(e.target.id==="lcs"){lc=e.target.value;show()}});
+document.addEventListener("click",async function(e){
+  var t=e.target.closest("[data-a],#tabs button");if(!t)return;
+  if(t.dataset.t){tab=t.dataset.t;say("");return show()}
+  var a=t.dataset.a,v=t.dataset.v;
+  if(a==="ap")await run(sb.from("enrollments").update({status:"approved",approved_at:new Date().toISOString()}).eq("id",v),"Approved. The student can now open the course.");
+  else if(a==="rj"){if(confirm("Reject this request?"))await run(sb.from("enrollments").update({status:"rejected"}).eq("id",v),"Request rejected.")}
+  else if(a==="rv"){if(confirm("Remove this student's access to the course?"))await run(sb.from("enrollments").update({status:"rejected"}).eq("id",v),"Access removed.")}
+  else if(a==="addC"){var n=$("nt").value.trim(),p=parseInt($("np").value,10);
+    if(!n||isNaN(p)||p<0)return say("Enter a title and a price in numbers.",1);
+    await run(sb.from("courses").insert({title:n,description:$("nd").value.trim(),price:p,published:true}),"Course added.")}
+  else if(a==="svC"){var pp=parseInt($("p"+v).value,10),tt=$("t"+v).value.trim();
+    if(!tt||isNaN(pp)||pp<0)return say("Enter a title and a price in numbers.",1);
+    await run(sb.from("courses").update({title:tt,description:$("d"+v).value.trim(),price:pp}).eq("id",v),"Course saved.")}
+  else if(a==="pub"){var c=A.courses.filter(function(x){return x.id===v})[0];await run(sb.from("courses").update({published:!c.published}).eq("id",v),c.published?"Course hidden.":"Course visible.")}
+  else if(a==="addL"){var lt=$("lt").value.trim(),lv=$("lv").value.trim(),lm=$("lm").value.trim(),lp=parseInt($("lp").value,10)||1;
+    if(!lt)return say("Enter the lesson title.",1);
+    if(!ok(lv)||!ok(lm))return say("Links must start with https://",1);
+    await run(sb.from("lessons").insert({course_id:lc,title:lt,video_url:lv||null,notes:$("ln").value.trim()||null,material_url:lm||null,position:lp}),"Lesson added.")}
+  else if(a==="delL"){if(confirm("Delete this lesson? Student progress on it is also removed."))await run(sb.from("lessons").delete().eq("id",v),"Lesson deleted.")}
+});
+
+async function enter(session){
+  if(!session){$("appView").className="wrap hide";$("authView").className="wrap";$("outBtn").className="hide";$("pw").value="";return}
+  $("authView").className="wrap hide";$("outBtn").className="";
+  var r=await sb.from("admins").select("user_id").eq("user_id",session.user.id).maybeSingle();
+  if(!r.data){$("appView").className="wrap";$("tabs").className="hide";$("content").innerHTML='<div class="card"><h3>Not an admin</h3><p>This account does not have admin access.</p></div>';return}
+  $("tabs").className="tabs";$("appView").className="wrap";await load();show();
+}
+sb.auth.onAuthStateChange(function(ev,s){if(ev==="SIGNED_IN"||ev==="SIGNED_OUT"||ev==="INITIAL_SESSION")setTimeout(function(){enter(s)},0)});
+</script>
+</body>
+</html>
