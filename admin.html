@@ -30,6 +30,7 @@ textarea{min-height:90px}
 .row{display:flex;gap:8px}.row .btn{flex:1}
 .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 9px;border-radius:20px;background:#E3F6EA;color:#14793C;margin:0 6px 6px 0}
 .badge.w{background:#FFF3D6;color:#8A5A00}
+.bar{height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin:6px 0 8px}.bar i{display:block;height:100%;width:0;background:var(--green)}
 .hide{display:none}.muted{color:var(--muted);font-size:14px}
 </style>
 </head>
@@ -49,9 +50,11 @@ textarea{min-height:90px}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.1.0/dist/tus.min.js"></script>
 <script>
 var sb=supabase.createClient("https://cogebzxdqlhojzabqeli.supabase.co","sb_publishable_QwatGWcSpnVydE7j8Uj3gQ_G5GxFsI9");
-var A={courses:[],enr:[],prof:[],les:[]},tab="pay",lc=null;
+var A={courses:[],enr:[],prof:[],les:[]},tab="pay",lc=null,VS={},UP={};
+var SN={0:"Waiting for upload",1:"Uploaded",2:"Processing",3:"Encoding",4:"Ready",5:"Error - upload again",6:"Upload failed - upload again"};
 function $(i){return document.getElementById(i)}
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 function naira(n){return "\u20A6"+Number(n).toLocaleString("en-NG")}
@@ -60,6 +63,16 @@ function ok(u){return !u||/^https:\/\//.test(u)}
 function cname(id){var c=A.courses.filter(function(x){return x.id===id})[0];return c?c.title:"(deleted)"}
 function pr(id){return A.prof.filter(function(p){return p.id===id})[0]||{full_name:"(no name)",email:""}}
 function dt(s){return s?new Date(s).toLocaleDateString("en-GB"):""}
+function lesson(id){return A.les.filter(function(l){return l.id===id})[0]}
+async function adm(b){
+  var r;
+  if(b.action==="create")r=await sb.rpc("admin_bunny_create",{p_title:b.title});
+  else if(b.action==="status")r=await sb.rpc("admin_bunny_status",{p_video:b.videoId});
+  else if(b.action==="delete")r=await sb.rpc("admin_bunny_delete",{p_video:b.videoId});
+  else throw new Error("Unknown action");
+  if(r.error)throw new Error(r.error.message);
+  return r.data;
+}
 
 $("goBtn").onclick=async function(){
   var r=await sb.auth.signInWithPassword({email:$("em").value.trim(),password:$("pw").value});
@@ -75,6 +88,7 @@ async function load(){
 function show(){
   var T=$("tabs").children;for(var i=0;i<T.length;i++)T[i].className=T[i].dataset.t===tab?"on":"";
   $("content").innerHTML=tab==="pay"?vPay():tab==="stu"?vStu():tab==="crs"?vCrs():vLes();
+  if(tab==="les")A.les.filter(function(l){return l.course_id===lc&&l.video_id&&!UP[l.id]}).forEach(chk);
 }
 function vPay(){
   var P=A.enr.filter(function(e){return e.status==="pending"});
@@ -97,12 +111,58 @@ function vCrs(){
 function vLes(){
   var L=A.les.filter(function(l){return l.course_id===lc});
   return '<h2>Lessons</h2><label for="lcs">Course</label><select id="lcs">'+A.courses.map(function(c){return '<option value="'+c.id+'"'+(c.id===lc?" selected":"")+'>'+esc(c.title)+'</option>'}).join("")+'</select>'+
-  '<div class="card"><h3>Add a lesson</h3><label for="lt">Lesson title</label><input id="lt"><label for="lv">Video link (YouTube unlisted, https://...)</label><input id="lv" inputmode="url"><label for="ln">Notes (optional)</label><textarea id="ln"></textarea><label for="lm">Material link, e.g. PDF (optional, https://...)</label><input id="lm" inputmode="url"><label for="lp">Lesson number</label><input id="lp" inputmode="numeric" value="'+(L.length+1)+'"><button class="btn b1 full" data-a="addL">Add lesson</button></div>'+
-  '<h3 style="margin:16px 0 8px">Lessons in this course ('+L.length+')</h3>'+L.map(function(l){return '<div class="card"><h3>'+l.position+'. '+esc(l.title)+'</h3><p>'+esc(l.video_url||"No video")+'</p><button class="btn b4 sm" data-a="delL" data-v="'+l.id+'">Delete lesson</button></div>'}).join("");
+  '<div class="card"><h3>Add a lesson</h3><p>Add the lesson first, then upload its video from the lesson card below.</p><label for="lt">Lesson title</label><input id="lt"><label for="lv">Video link (optional, only if you are not uploading a video)</label><input id="lv" inputmode="url"><label for="ln">Notes / script</label><textarea id="ln"></textarea><label for="lm">Material link, e.g. PDF (optional, https://...)</label><input id="lm" inputmode="url"><label for="lp">Lesson number</label><input id="lp" inputmode="numeric" value="'+(L.length+1)+'"><button class="btn b1 full" data-a="addL">Add lesson</button></div>'+
+  '<h3 style="margin:16px 0 8px">Lessons in this course ('+L.length+')</h3>'+L.map(function(l){var id=l.id;
+    return '<div class="card"><h3>'+l.position+'. '+esc(l.title)+'</h3><p>'+(l.video_id?'Video: <b id="vs'+id+'">Checking...</b>':esc(l.video_url||"No video yet"))+'</p>'+
+    '<div class="bar hide" id="pw'+id+'"><i id="pb'+id+'"></i></div><p class="muted" id="pm'+id+'"></p>'+
+    '<input type="file" accept="video/*" class="hide" id="f'+id+'" data-lid="'+id+'">'+
+    '<div class="row"><button class="btn b1 sm" data-a="pick" data-v="'+id+'">'+(l.video_id?"Replace video":"Upload video")+'</button>'+(l.video_id?'<button class="btn b4 sm" data-a="delV" data-v="'+id+'">Delete video</button>':'')+'</div>'+
+    '<div style="height:10px"></div><button class="btn b4 sm" data-a="delL" data-v="'+id+'">Delete lesson</button></div>'}).join("");
 }
 async function run(q,okMsg){var r=await q;if(r.error){say("Error: "+r.error.message,1);return false}await load();show();say(okMsg);return true}
 
-document.addEventListener("change",function(e){if(e.target.id==="lcs"){lc=e.target.value;show()}});
+/* ---- Bunny: status ---- */
+async function chk(l){
+  var e=$("vs"+l.id);
+  try{var r=await adm({action:"status",videoId:l.video_id});VS[l.video_id]=r.status;
+    if(e)e.textContent=(SN[r.status]||"Status "+r.status)+((r.status>=1&&r.status<4&&r.progress!=null)?" ("+r.progress+"%)":"")}
+  catch(x){if(e)e.textContent="Could not check status"}
+}
+setInterval(function(){if(tab!=="les")return;A.les.filter(function(l){return l.course_id===lc&&l.video_id&&VS[l.video_id]!==4&&!UP[l.id]}).forEach(chk)},8000);
+
+/* ---- Bunny: upload ---- */
+function setP(id,pct,msg){var w=$("pw"+id),b=$("pb"+id),m=$("pm"+id);if(w)w.className="bar";if(b)b.style.width=pct+"%";if(m)m.textContent=msg||""}
+async function startUpload(lid,file){
+  var l=lesson(lid);if(!l||!file)return;
+  if(UP[lid])return say("An upload is already running for this lesson.",1);
+  UP[lid]=1;var oldId=l.video_id,c=null;
+  try{
+    setP(lid,0,"Preparing upload...");
+    c=await adm({action:"create",title:l.title});
+    await new Promise(function(res,rej){
+      var u=new tus.Upload(file,{endpoint:"https://video.bunnycdn.com/tusupload",retryDelays:[0,3000,5000,10000,20000],
+        headers:{AuthorizationSignature:c.signature,AuthorizationExpire:String(c.expire),VideoId:c.videoId,LibraryId:String(c.libraryId)},
+        metadata:{filetype:file.type||"video/mp4",title:l.title},
+        onError:rej,
+        onProgress:function(a,t){var p=Math.round(a/t*100);setP(lid,p,"Uploading "+p+"%. Keep this page open and your screen on.")},
+        onSuccess:res});
+      u.start();
+    });
+    var r=await sb.from("lessons").update({video_id:c.videoId}).eq("id",lid);
+    if(r.error)throw new Error(r.error.message);
+    if(oldId){try{await adm({action:"delete",videoId:oldId})}catch(e){}}
+    await load();say("Upload finished. Bunny is now processing the video. This can take a few minutes.");
+  }catch(e){
+    if(c&&c.videoId){try{await adm({action:"delete",videoId:c.videoId})}catch(x){}}
+    say("Upload failed: "+(e&&e.message?e.message:e),1);
+  }
+  delete UP[lid];show();
+}
+
+document.addEventListener("change",function(e){
+  if(e.target.id==="lcs"){lc=e.target.value;show()}
+  else if(e.target.dataset&&e.target.dataset.lid){var f=e.target.files[0];e.target.value="";startUpload(e.target.dataset.lid,f)}
+});
 document.addEventListener("click",async function(e){
   var t=e.target.closest("[data-a],#tabs button");if(!t)return;
   if(t.dataset.t){tab=t.dataset.t;say("");return show()}
@@ -120,8 +180,16 @@ document.addEventListener("click",async function(e){
   else if(a==="addL"){var lt=$("lt").value.trim(),lv=$("lv").value.trim(),lm=$("lm").value.trim(),lp=parseInt($("lp").value,10)||1;
     if(!lt)return say("Enter the lesson title.",1);
     if(!ok(lv)||!ok(lm))return say("Links must start with https://",1);
-    await run(sb.from("lessons").insert({course_id:lc,title:lt,video_url:lv||null,notes:$("ln").value.trim()||null,material_url:lm||null,position:lp}),"Lesson added.")}
-  else if(a==="delL"){if(confirm("Delete this lesson? Student progress on it is also removed."))await run(sb.from("lessons").delete().eq("id",v),"Lesson deleted.")}
+    await run(sb.from("lessons").insert({course_id:lc,title:lt,video_url:lv||null,notes:$("ln").value.trim()||null,material_url:lm||null,position:lp}),"Lesson added. Now tap Upload video on its card.")}
+  else if(a==="pick"){if(UP[v])return;var f=$("f"+v);if(f)f.click()}
+  else if(a==="delV"){var L1=lesson(v);
+    if(L1&&L1.video_id&&confirm("Delete this lesson's video? Students will see no video until you upload a new one.")){
+      try{await adm({action:"delete",videoId:L1.video_id})}catch(x){return say("Could not delete the video: "+x.message,1)}
+      await run(sb.from("lessons").update({video_id:null}).eq("id",v),"Video deleted.")}}
+  else if(a==="delL"){var L2=lesson(v);
+    if(confirm("Delete this lesson? Its video and student progress on it are also removed.")){
+      if(L2&&L2.video_id){try{await adm({action:"delete",videoId:L2.video_id})}catch(x){}}
+      await run(sb.from("lessons").delete().eq("id",v),"Lesson deleted.")}}
 });
 
 async function enter(session){
