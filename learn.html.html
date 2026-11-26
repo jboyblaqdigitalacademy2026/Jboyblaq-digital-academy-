@@ -178,7 +178,7 @@ function courseView(){
   h+='<div class="card"><h3>Lesson '+(curLesson+1)+': '+esc(l.title)+'</h3><div class="lgrid"><div>'+(l.video_id?'<div class="video" id="vbox"><p style="color:#fff;padding:14px;margin:0">Loading video...</p></div>':embed(l.video_url))+'</div><div>';
   if(l.notes)h+='<p class="notes">'+esc(l.notes)+'</p>';
   if(/^https:\/\//.test(l.material_url||""))h+='<a class="btn b2 full" style="margin-bottom:10px" target="_blank" rel="noopener" href="'+esc(l.material_url)+'">Download learning material</a>';
-  h+='</div></div><div class="row">'+(curLesson>0?'<button class="btn b2" data-a="prev">Previous lesson</button>':'')+'<button class="btn '+(dn?'b2':'b3')+'" id="doneBtn" data-a="done" data-v="'+l.id+'"'+(dn?' disabled':'')+'>'+(dn?'Completed':'Mark complete')+'</button>'+(curLesson<L.length-1?'<button class="btn b1" data-a="next">Next lesson</button>':'')+'</div></div>';
+  h+='</div></div><div class="row">'+(curLesson>0?'<button class="btn b2" data-a="prev">Previous lesson</button>':'')+'<button class="btn '+(dn?'b2':'b3')+'" id="doneBtn" data-a="done" data-v="'+l.id+'">'+(dn?'Completed. Tap to undo':'Mark complete')+'</button>'+(curLesson<L.length-1?'<button class="btn b1" data-a="next">Next lesson</button>':'')+'</div></div>';
   return h+'<h3 style="margin:18px 0 8px">Course lessons</h3><div id="plist">'+plist()+'</div>';
 }
 
@@ -189,23 +189,31 @@ function saveResume(cid,lid,sec){
   S.resume[cid]={course_id:cid,lesson_id:lid,seconds:sec};
   sb.from("course_resume").upsert({user_id:S.user.id,course_id:cid,lesson_id:lid,seconds:Math.floor(sec||0),updated_at:new Date().toISOString()}).then(function(){});
 }
+function setDoneBtn(lid,dn){var b=$("doneBtn");if(b&&b.dataset.v===lid){b.className="btn "+(dn?"b2":"b3");b.textContent=dn?"Completed. Tap to undo":"Mark complete"}}
 async function markDone(lid){
-  if(S.done[lid])return;S.done[lid]=1;
-  var b=$("doneBtn");if(b&&b.dataset.v===lid){b.disabled=true;b.className="btn b2";b.textContent="Completed"}
-  refreshSide();
+  if(S.done[lid])return;S.done[lid]=1;setDoneBtn(lid,true);refreshSide();
   await sb.from("lesson_progress").upsert({user_id:S.user.id,lesson_id:lid});
 }
+async function unmarkDone(lid){
+  if(!S.done[lid])return;delete S.done[lid];setDoneBtn(lid,false);refreshSide();
+  await sb.from("lesson_progress").delete().eq("user_id",S.user.id).eq("lesson_id",lid);
+}
+function toggleDone(lid){return S.done[lid]?unmarkDone(lid):markDone(lid)}
 function hook(lid,cid,fr){
   if(typeof playerjs==="undefined"||!fr)return;
   try{
-    var pl=new playerjs.Player(fr),rs=S.resume[cid]&&S.resume[cid].lesson_id===lid?Number(S.resume[cid].seconds)||0:0;
+    var maxSeen=0,pl=new playerjs.Player(fr),rs=S.resume[cid]&&S.resume[cid].lesson_id===lid?Number(S.resume[cid].seconds)||0:0;
     pl.on("ready",function(){
       if(rs>5)pl.getDuration(function(d){if(!d||rs<d-10)pl.setCurrentTime(rs)});
       pl.on("timeupdate",function(d){
         if(curLessonId()!==lid)return;
+        if(d.seconds>maxSeen)maxSeen=d.seconds;
         var now=Date.now();if(now-lastSave>10000){lastSave=now;saveResume(cid,lid,d.seconds)}
       });
-      pl.on("ended",function(){if(curLessonId()===lid){saveResume(cid,lid,0);markDone(lid)}});
+      pl.on("ended",function(){
+        if(curLessonId()!==lid)return;
+        pl.getDuration(function(dur){saveResume(cid,lid,0);if(dur&&maxSeen>=dur*0.6)markDone(lid)});
+      });
     });
   }catch(e){}
 }
@@ -242,7 +250,7 @@ document.addEventListener("click",async function(e){
     if(r.error&&r.error.code!=="23505"){t.disabled=false;return alert("Could not save your request. Please try again.")}
     await loadAll();payFor=v;show();scrollTo(0,0);
   }
-  else if(a==="done"){markDone(v)}
+  else if(a==="done"){toggleDone(v)}
   else if(a==="saveName"){
     var n=$("afn").value.trim();if(!n)return note("cmsg","Name cannot be empty.",1);
     var r1=await sb.from("profiles").update({full_name:n}).eq("id",S.user.id);
