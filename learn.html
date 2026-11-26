@@ -1,4 +1,275 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0056D2">
+<title>Student Area | JboyBlaq Digital Academy</title>
+<style>
+:root{--blue:#0056D2;--dark:#00307A;--soft:#EAF1FD;--ink:#1B2A41;--muted:#5B6B82;--line:#DCE4F0;--green:#1FA855;--red:#C62828;box-sizing:border-box;padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:#F6F8FC;line-height:1.5;-webkit-text-size-adjust:100%}
+.wrap{max-width:900px;margin:0 auto;padding:16px}
+header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;padding-top:env(safe-area-inset-top,0px)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:56px;max-width:900px;margin:0 auto;padding:0 16px}
+.brand{font-weight:800;color:var(--blue);font-size:17px}.brand span{color:var(--ink)}
+.btn{display:inline-block;border:0;border-radius:10px;padding:13px 18px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;text-align:center}
+.b1{background:var(--blue);color:#fff}.b2{background:var(--soft);color:var(--blue)}.b3{background:var(--green);color:#fff}
+.full{width:100%}.sm{padding:9px 13px;font-size:14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.card h3{margin:0 0 6px;font-size:18px}.card p{margin:0 0 12px;color:var(--muted);font-size:15px}
+h2{margin:6px 0 14px;font-size:22px}
+label{display:block;font-size:14px;font-weight:600;margin:0 0 5px}
+input{width:100%;font-size:16px;padding:12px;border:1px solid var(--line);border-radius:10px;margin-bottom:13px;font-family:inherit}
+.tabs{display:flex;gap:6px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:5px;margin-bottom:16px}
+.tabs button{flex:1;border:0;background:none;padding:10px 4px;border-radius:8px;font-size:15px;font-weight:600;color:var(--muted);font-family:inherit;cursor:pointer}
+.tabs button.on{background:var(--blue);color:#fff}
+.msg{padding:11px 13px;border-radius:10px;font-size:14px;margin-bottom:13px;background:var(--soft);color:var(--dark)}
+.msg.err{background:#FDECEC;color:var(--red)}
+.bar{height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin:6px 0 12px}.bar i{display:block;height:100%;background:var(--green)}
+.badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--soft);color:var(--blue);margin-bottom:8px}
+.badge.ok{background:#E3F6EA;color:#14793C}.badge.wait{background:#FFF3D6;color:#8A5A00}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row .btn{flex:1}
+.video{position:relative;aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;margin-bottom:12px}
+.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.lesson{display:flex;gap:10px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:#fff;cursor:pointer;font-size:15px}
+.lesson.cur{border-color:var(--blue);background:var(--soft)}
+.dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);flex:none;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff}
+.dot.d{background:var(--green);border-color:var(--green)}
+.bank{background:var(--soft);border-radius:10px;padding:12px;margin-bottom:12px;font-size:15px}
+.bank div{display:flex;justify-content:space-between;gap:8px;padding:3px 0}.bank span{color:var(--muted)}
+.notes{white-space:pre-wrap;font-size:15px;margin:0 0 12px}
+.lgrid>div:first-child{position:sticky;top:calc(56px + env(safe-area-inset-top,0px));z-index:4;background:#fff;padding-bottom:6px}
+@media(min-width:900px){.lgrid{display:grid;grid-template-columns:3fr 2fr;gap:18px;align-items:start}}
+.hide{display:none}
+.muted{color:var(--muted);font-size:14px}
+a.back{color:var(--blue);font-weight:600;text-decoration:none;display:inline-block;margin-bottom:10px;cursor:pointer}
+</style>
+</head>
+<body>
+<header><div class="nav">
+  <div class="brand">JboyBlaq <span>Digital Academy</span></div>
+  <a href="./" class="muted" style="text-decoration:none">&larr; Home</a>
+</div></header>
+
+<div class="wrap" id="authView" style="max-width:440px">
+  <div class="card" style="margin-top:20px">
+    <div class="tabs"><button id="tLogin" class="on">Log in</button><button id="tReg">Register</button></div>
+    <div id="amsg"></div>
+    <form id="lf" action="#" autocomplete="on">
+    <div id="nameBox" class="hide"><label for="fn">Full name</label><input id="fn" autocomplete="name"></div>
+    <label for="em">Email</label><input id="em" name="username" type="email" autocomplete="username" inputmode="email" autocapitalize="none">
+    <label for="pw">Password (at least 6 characters)</label><input id="pw" name="password" type="password" autocomplete="current-password">
+    <button type="submit" class="btn b1 full" id="goBtn">Log in</button>
+    </form>
+  </div>
+</div>
+
+<div class="wrap hide" id="appView">
+  <div class="tabs" id="mainTabs">
+    <button data-t="my" class="on">My Courses</button><button data-t="browse">All Courses</button><button data-t="acct">My Account</button>
+  </div>
+  <div id="content"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="https://assets.mediadelivery.net/playerjs/playerjs-latest.min.js"></script>
+<script>
+var SB_URL="https://cogebzxdqlhojzabqeli.supabase.co";
+var SB_KEY="sb_publishable_QwatGWcSpnVydE7j8Uj3gQ_G5GxFsI9";
+var WHATSAPP_NUMBER="2347088238970",BANK_NAME="Zenith Bank",ACCOUNT_NAME="Pam Ambrose Aondongu",ACCOUNT_NUMBER="4204156257";
+
+var sb=supabase.createClient(SB_URL,SB_KEY);
+var S={user:null,profile:null,courses:[],enr:{},lessons:[],done:{},resume:{}},tab="my",curCourse=null,curLesson=0,payFor=null,regMode=false;
+function $(i){return document.getElementById(i)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function naira(n){return "\u20A6"+Number(n).toLocaleString("en-NG")}
+function note(el,t,err){$(el).innerHTML=t?'<div class="msg'+(err?' err':'')+'">'+esc(t)+'</div>':""}
+
+/* ---- login / register ---- */
+function mode(reg){regMode=reg;$("tLogin").className=reg?"":"on";$("tReg").className=reg?"on":"";
+  $("nameBox").className=reg?"":"hide";$("goBtn").textContent=reg?"Create my account":"Log in";
+  $("pw").autocomplete=reg?"new-password":"current-password";note("amsg","")}
+$("tLogin").onclick=function(){mode(false)};$("tReg").onclick=function(){mode(true)};
+$("lf").onsubmit=function(e){e.preventDefault();$("goBtn").onclick()};
+$("goBtn").onclick=async function(){
+  var em=$("em").value.trim(),pw=$("pw").value,fn=$("fn").value.trim();
+  if(!em||pw.length<6){return note("amsg","Enter your email and a password of at least 6 characters.",1)}
+  if(regMode&&!fn){return note("amsg","Please enter your full name.",1)}
+  this.disabled=true;var r;
+  if(regMode){r=await sb.auth.signUp({email:em,password:pw,options:{data:{full_name:fn}}});
+    if(!r.error&&!r.data.session){this.disabled=false;mode(false);return note("amsg","Account created. Check your email to confirm it, then log in.")}}
+  else{r=await sb.auth.signInWithPassword({email:em,password:pw})}
+  this.disabled=false;
+  if(r.error){return note("amsg",r.error.message,1)}
+};
+async function logout(){await sb.auth.signOut()}
+
+/* ---- data ---- */
+async function loadAll(){
+  var u=S.user.id;
+  var r=await Promise.all([
+    sb.from("courses").select("*").order("created_at"),
+    sb.from("enrollments").select("*").eq("user_id",u),
+    sb.from("lessons").select("*").order("position").order("created_at"),
+    sb.from("lesson_progress").select("lesson_id").eq("user_id",u),
+    sb.from("profiles").select("*").eq("id",u).maybeSingle(),
+    sb.from("course_resume").select("*").eq("user_id",u)]);
+  S.courses=r[0].data||[];S.enr={};(r[1].data||[]).forEach(function(e){S.enr[e.course_id]=e});
+  S.lessons=r[2].data||[];S.done={};(r[3].data||[]).forEach(function(p){S.done[p.lesson_id]=1});
+  S.profile=r[4].data||{full_name:"",email:S.user.email};
+  S.resume={};(r[5].data||[]).forEach(function(x){S.resume[x.course_id]=x});
+}
+function approved(cid){return S.enr[cid]&&S.enr[cid].status==="approved"}
+function lessonsOf(cid){return S.lessons.filter(function(l){return l.course_id===cid})}
+function progress(cid){var L=lessonsOf(cid),d=L.filter(function(l){return S.done[l.id]}).length;return{n:L.length,d:d,p:L.length?Math.round(d/L.length*100):0}}
+
+/* ---- views ---- */
+function show(){
+  $("mainTabs").className=curCourse?"hide":"tabs";
+  var h="";
+  if(curCourse)h=courseView();else if(tab==="my")h=myView();else if(tab==="browse")h=browseView();else h=acctView();
+  $("content").innerHTML=h;
+  if(curCourse)loadVideo();
+  var T=$("mainTabs").children;for(var i=0;i<T.length;i++)T[i].className=T[i].dataset.t===tab?"on":"";
+}
+function myView(){
+  var name=esc((S.profile.full_name||"").split(" ")[0]||"Student");
+  var list=S.courses.filter(function(c){return approved(c.id)});
+  var h="<h2>Welcome, "+name+"</h2>";
+  if(!list.length)return h+'<div class="card"><h3>No courses yet</h3><p>Courses appear here after your payment is confirmed. Pick a course to get started.</p><button class="btn b1 full" data-a="tab" data-v="browse">See all courses</button></div>';
+  return h+list.map(function(c){var p=progress(c.id);
+    return '<div class="card"><span class="badge ok">Lifetime access</span><h3>'+esc(c.title)+'</h3><p>'+p.d+' of '+p.n+' lessons done</p><div class="bar"><i style="width:'+p.p+'%"></i></div><button class="btn b1 full" data-a="open" data-v="'+c.id+'">'+(p.d||S.resume[c.id]?"Continue learning":"Start learning")+'</button></div>'}).join("");
+}
+function browseView(){
+  var h="<h2>All courses</h2>";
+  if(payFor)h+=payCard();
+  return h+S.courses.map(function(c){var e=S.enr[c.id],b;
+    if(e&&e.status==="approved")b='<span class="badge ok">Approved</span><button class="btn b1 full" data-a="open" data-v="'+c.id+'">Open course</button>';
+    else if(e&&e.status==="pending")b='<span class="badge wait">Waiting for payment confirmation</span><button class="btn b2 full" data-a="pay" data-v="'+c.id+'">Payment details</button>';
+    else b='<button class="btn b1 full" data-a="req" data-v="'+c.id+'">Buy this course</button>';
+    return '<div class="card"><h3>'+esc(c.title)+'</h3><p>'+esc(c.description)+'</p><p><b style="color:var(--blue);font-size:20px">'+naira(c.price)+'</b> &middot; one-time &middot; lifetime access</p>'+b+'</div>'}).join("");
+}
+function payCard(){
+  var c=S.courses.filter(function(x){return x.id===payFor})[0];if(!c)return"";
+  var m="Hello JboyBlaq Digital Academy, I have paid for a course.\n\nName: "+(S.profile.full_name||"")+"\nEmail: "+S.user.email+"\nCourse: "+c.title+"\nAmount: "+naira(c.price)+"\n\nI am sending my payment receipt now. Please confirm and approve my access.";
+  return '<div class="card" style="border-color:var(--blue)"><h3>Pay for: '+esc(c.title)+'</h3><p>Transfer exactly <b>'+naira(c.price)+'</b> to this account:</p><div class="bank"><div><span>Bank</span><b>'+BANK_NAME+'</b></div><div><span>Account name</span><b>'+ACCOUNT_NAME+'</b></div><div><span>Account number</span><b>'+ACCOUNT_NUMBER+'</b></div></div><p>Then send your receipt on WhatsApp. We will approve your course after we confirm payment. Use the same email you registered with.</p><a class="btn b3 full" target="_blank" rel="noopener" href="https://wa.me/'+WHATSAPP_NUMBER+'?text='+encodeURIComponent(m)+'">I have paid, message us on WhatsApp</a></div>';
+}
+function acctView(){
+  return '<h2>My Account</h2><div id="cmsg"></div><div class="card"><h3>Profile</h3><label for="afn">Full name</label><input id="afn" value="'+esc(S.profile.full_name)+'"><label>Email</label><input value="'+esc(S.user.email)+'" disabled><button class="btn b1 full" data-a="saveName">Save name</button></div><div class="card"><h3>Change password</h3><label for="np">New password (at least 6 characters)</label><input id="np" type="password" autocomplete="new-password"><button class="btn b2 full" data-a="savePw">Update password</button></div><button class="btn b2 full" data-a="logout">Log out</button>';
+}
+function embed(u){
+  if(!/^https:\/\//.test(u||""))return"";
+  var m=u.match(/(?:youtu\.be\/|v=|embed\/)([\w-]{11})/);
+  if(m)return '<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/'+m[1]+'" allowfullscreen loading="lazy"></iframe></div>';
+  return '<a class="btn b2 full" style="margin-bottom:12px" target="_blank" rel="noopener" href="'+esc(u)+'">Open video</a>';
+}
+function pbox(){var p=progress(curCourse);return '<div class="bar"><i style="width:'+p.p+'%"></i></div><p class="muted">'+p.d+' of '+p.n+' lessons completed ('+p.p+'%)</p>'}
+function plist(){return lessonsOf(curCourse).map(function(x,i){return '<div class="lesson'+(i===curLesson?' cur':'')+'" data-a="go" data-v="'+i+'"><span class="dot'+(S.done[x.id]?' d':'')+'">'+(S.done[x.id]?'&#10003;':'')+'</span>Lesson '+(i+1)+': '+esc(x.title)+'</div>'}).join("")}
+function refreshSide(){if($("pbox"))$("pbox").innerHTML=pbox();if($("plist"))$("plist").innerHTML=plist()}
+function courseView(){
+  var c=S.courses.filter(function(x){return x.id===curCourse})[0],L=lessonsOf(curCourse);
+  if(!c||!approved(curCourse))return'<div class="card"><p>You do not have access to this course.</p></div>';
+  var h='<a class="back" data-a="back">&larr; My Courses</a><h2>'+esc(c.title)+'</h2>';
+  if(!L.length)return h+'<div class="card"><p>Lessons are being added. Please check back soon.</p></div>';
+  if(curLesson>=L.length)curLesson=L.length-1;if(curLesson<0)curLesson=0;
+  var l=L[curLesson],dn=S.done[l.id];
+  h+='<div id="pbox">'+pbox()+'</div>';
+  h+='<div class="card"><h3>Lesson '+(curLesson+1)+': '+esc(l.title)+'</h3><div class="lgrid"><div>'+(l.video_id?'<div class="video" id="vbox"><p style="color:#fff;padding:14px;margin:0">Loading video...</p></div>':embed(l.video_url))+'</div><div>';
+  if(l.notes)h+='<p class="notes">'+esc(l.notes)+'</p>';
+  if(/^https:\/\//.test(l.material_url||""))h+='<a class="btn b2 full" style="margin-bottom:10px" target="_blank" rel="noopener" href="'+esc(l.material_url)+'">Download learning material</a>';
+  h+='</div></div><div class="row">'+(curLesson>0?'<button class="btn b2" data-a="prev">Previous lesson</button>':'')+'<button class="btn '+(dn?'b2':'b3')+'" id="doneBtn" data-a="done" data-v="'+l.id+'"'+(dn?' disabled':'')+'>'+(dn?'Completed':'Mark complete')+'</button>'+(curLesson<L.length-1?'<button class="btn b1" data-a="next">Next lesson</button>':'')+'</div></div>';
+  return h+'<h3 style="margin:18px 0 8px">Course lessons</h3><div id="plist">'+plist()+'</div>';
+}
+
+/* ---- secure video ---- */
+var vseq=0,lastSave=0;
+function curLessonId(){var L=lessonsOf(curCourse);return L[curLesson]&&L[curLesson].id}
+function saveResume(cid,lid,sec){
+  S.resume[cid]={course_id:cid,lesson_id:lid,seconds:sec};
+  sb.from("course_resume").upsert({user_id:S.user.id,course_id:cid,lesson_id:lid,seconds:Math.floor(sec||0),updated_at:new Date().toISOString()}).then(function(){});
+}
+async function markDone(lid){
+  if(S.done[lid])return;S.done[lid]=1;
+  var b=$("doneBtn");if(b&&b.dataset.v===lid){b.disabled=true;b.className="btn b2";b.textContent="Completed"}
+  refreshSide();
+  await sb.from("lesson_progress").upsert({user_id:S.user.id,lesson_id:lid});
+}
+function hook(lid,cid,fr){
+  if(typeof playerjs==="undefined"||!fr)return;
+  try{
+    var pl=new playerjs.Player(fr),rs=S.resume[cid]&&S.resume[cid].lesson_id===lid?Number(S.resume[cid].seconds)||0:0;
+    pl.on("ready",function(){
+      if(rs>5)pl.getDuration(function(d){if(!d||rs<d-10)pl.setCurrentTime(rs)});
+      pl.on("timeupdate",function(d){
+        if(curLessonId()!==lid)return;
+        var now=Date.now();if(now-lastSave>10000){lastSave=now;saveResume(cid,lid,d.seconds)}
+      });
+      pl.on("ended",function(){if(curLessonId()===lid){saveResume(cid,lid,0);markDone(lid)}});
+    });
+  }catch(e){}
+}
+async function loadVideo(){
+  var L=lessonsOf(curCourse),l=L[curLesson];if(!l||!l.video_id||!$("vbox"))return;
+  var my=++vseq,lid=l.id,cid=curCourse;
+  var r=await sb.rpc("play_url",{p_lesson:lid});
+  if(my!==vseq||!$("vbox"))return;
+  if(r.error||!r.data){$("vbox").innerHTML='<p style="color:#fff;padding:14px;margin:0">The video is not available yet. If it was just uploaded, please check again in a few minutes.</p>';return}
+  $("vbox").innerHTML='<iframe id="vfr" src="'+esc(r.data)+'" allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;fullscreen" allowfullscreen loading="lazy"></iframe>';
+  hook(lid,cid,$("vfr"));
+}
+function gotoLesson(i){curLesson=i;show();scrollTo(0,0);var id=curLessonId();if(id)saveResume(curCourse,id,0)}
+
+/* ---- actions ---- */
+document.addEventListener("click",async function(e){
+  var t=e.target.closest("[data-a],#mainTabs button");if(!t)return;
+  if(t.dataset.t){tab=t.dataset.t;payFor=null;return show()}
+  var a=t.dataset.a,v=t.dataset.v;
+  if(a==="tab"){tab=v;show()}
+  else if(a==="logout")logout();
+  else if(a==="back"){curCourse=null;tab="my";show()}
+  else if(a==="open"){curCourse=v;var L=lessonsOf(v),i=-1,rs=S.resume[v];
+    if(rs&&rs.lesson_id){for(var k=0;k<L.length;k++){if(L[k].id===rs.lesson_id){i=k;break}}}
+    if(i<0){i=0;while(i<L.length&&S.done[L[i].id])i++;if(i>=L.length)i=0}
+    curLesson=i;show();scrollTo(0,0)}
+  else if(a==="go"){gotoLesson(+v)}
+  else if(a==="next"){gotoLesson(curLesson+1)}
+  else if(a==="prev"){gotoLesson(curLesson-1)}
+  else if(a==="pay"){payFor=v;show();scrollTo(0,0)}
+  else if(a==="req"){
+    t.disabled=true;
+    var r=await sb.from("enrollments").insert({user_id:S.user.id,course_id:v});
+    if(r.error&&r.error.code!=="23505"){t.disabled=false;return alert("Could not save your request. Please try again.")}
+    await loadAll();payFor=v;show();scrollTo(0,0);
+  }
+  else if(a==="done"){markDone(v)}
+  else if(a==="saveName"){
+    var n=$("afn").value.trim();if(!n)return note("cmsg","Name cannot be empty.",1);
+    var r1=await sb.from("profiles").update({full_name:n}).eq("id",S.user.id);
+    if(r1.error)return note("cmsg","Could not save. Try again.",1);
+    S.profile.full_name=n;note("cmsg","Name saved.");
+  }
+  else if(a==="savePw"){
+    var p=$("np").value;if(p.length<6)return note("cmsg","Password must be at least 6 characters.",1);
+    var r2=await sb.auth.updateUser({password:p});
+    if(r2.error)return note("cmsg",r2.error.message,1);
+    $("np").value="";note("cmsg","Password updated.");
+  }
+});
+
+/* ---- start ---- */
+async function enter(session){
+  if(!session){S.user=null;curCourse=null;$("appView").className="wrap hide";$("authView").className="wrap";$("pw").value="";return}
+  S.user=session.user;await loadAll();
+  $("authView").className="wrap hide";$("appView").className="wrap";show();
+}
+sb.auth.onAuthStateChange(function(ev,session){
+  if(ev==="SIGNED_IN"||ev==="SIGNED_OUT"||ev==="INITIAL_SESSION"){setTimeout(function(){enter(session)},0)}
+});
+</script>
+</body>
+</html>
+!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
